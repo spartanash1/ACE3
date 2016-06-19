@@ -75,7 +75,13 @@ if (_state) then {
         };
         _animChangedEHID = _unit addEventHandler ["AnimChanged", {
             params ["_unit", "_newAnimation"];
-            TRACE_2("AnimChanged",_unit,_newAnimation);
+            TRACE_2("AnimChanged (handcuff)",_unit,_newAnimation);
+            if (!local _unit) exitWith {
+                private _animChangedEHID = _unit getVariable [QGVAR(handcuffAnimEHID), -1];
+                TRACE_3("no longer local, removing animChanged EH",_unit,local _unit,_animChangedEHID);
+                _unit removeEventHandler ["AnimChanged", _animChangedEHID];
+                _unit setVariable [QGVAR(handcuffAnimEHID), -1];
+            };
             if (_unit == (vehicle _unit)) then {
                 if ((_newAnimation != "ACE_AmovPercMstpSsurWnonDnon") && {!(_unit getVariable ["ACE_isUnconscious", false])}) then {
                     TRACE_1("Handcuff animation interrupted",_newAnimation);

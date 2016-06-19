@@ -66,6 +66,13 @@ if (_state) then {
             };
             _animChangedEHID = _unit addEventHandler ["AnimChanged", {
                 params ["_unit", "_newAnimation"];
+                TRACE_2("AnimChanged (surrender)",_unit,_newAnimation);
+                if (!local _unit) exitWith {
+                    private _animChangedEHID = _unit getVariable [QGVAR(surrenderAnimEHID), -1];
+                    TRACE_3("no longer local, removing animChanged EH",_unit,local _unit,_animChangedEHID);
+                    _unit removeEventHandler ["AnimChanged", _animChangedEHID];
+                    _unit setVariable [QGVAR(surrenderAnimEHID), -1];
+                };
                 if ((_newAnimation != "ACE_AmovPercMstpSsurWnonDnon") && {!(_unit getVariable ["ACE_isUnconscious", false])}) then {
                     TRACE_1("Surrender animation interrupted",_newAnimation);
                     [_unit, "ACE_AmovPercMstpSsurWnonDnon", 1] call EFUNC(common,doAnimation);
