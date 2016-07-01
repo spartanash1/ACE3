@@ -4,4 +4,8 @@ ADDON = false;
 
 #include "XEH_PREP.hpp"
 
+x = {
+#include "XEH_PREP.hpp"
+};
+
 ADDON = true;

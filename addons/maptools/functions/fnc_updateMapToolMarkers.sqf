@@ -18,6 +18,75 @@
 
 params ["_theMap"];
 
+
+
+
+#define TEXTURE_WIDTH_IN_M           6205
+#define DIST_BOTTOM_TO_CENTER_PERC  -0.33
+#define DIST_TOP_TO_CENTER_PERC      0.65
+#define DIST_LEFT_TO_CENTER_PERC     0.30
+
+private _posCenter = +GVAR(mapTool_pos);
+_posCenter set [2, 0];
+
+private _posTopRight = [
+(GVAR(mapTool_pos) select 0) + (cos GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (sin GVAR(mapTool_angle)) * DIST_TOP_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+(GVAR(mapTool_pos) select 1) + (-sin GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (cos GVAR(mapTool_angle)) * DIST_TOP_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+0];
+_theMap drawIcon ['iconStaticMG',[1,0,0,1],_posTopRight,24,24,getDir player,'1,1',1,0.03,'TahomaB','right'];
+
+private _posTopLeft = [
+(GVAR(mapTool_pos) select 0) + (-cos GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (sin GVAR(mapTool_angle)) * DIST_TOP_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+(GVAR(mapTool_pos) select 1) + (sin GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (cos GVAR(mapTool_angle)) * DIST_TOP_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+0];
+_theMap drawIcon ['iconStaticMG',[1,0,0,1],_posTopLeft,24,24,getDir player,'-1,1',1,0.03,'TahomaB','right'];
+
+private _posBottomLeft = [
+(GVAR(mapTool_pos) select 0) + (-cos GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (sin GVAR(mapTool_angle)) * DIST_BOTTOM_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+(GVAR(mapTool_pos) select 1) + (sin GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (cos GVAR(mapTool_angle)) * DIST_BOTTOM_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+0];
+_theMap drawIcon ['iconStaticMG',[1,0,0,1],_posBottomLeft,24,24,getDir player,'-1,-1',1,0.03,'TahomaB','right'];
+
+private _posBottomRight = [
+(GVAR(mapTool_pos) select 0) + (cos GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (sin GVAR(mapTool_angle)) * DIST_BOTTOM_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+(GVAR(mapTool_pos) select 1) + (-sin GVAR(mapTool_angle)) * DIST_LEFT_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5 + (cos GVAR(mapTool_angle)) * DIST_BOTTOM_TO_CENTER_PERC * TEXTURE_WIDTH_IN_M * 0.5,
+0];
+_theMap drawIcon ['iconStaticMG',[1,0,0,1],_posBottomRight,24,24,getDir player,'1,-1',1,0.03,'TahomaB','right'];
+
+_fnc_Distance = {
+    params ["_a", "_b", "_p"];
+    _n = _b vectorDiff _a;
+    _pa = _a vectorDiff _p;
+    _c = _n vectorMultiply ((_pa vectorDotProduct _n) / (_n vectorDotProduct _n));
+    _d = _pa vectorDiff _c;
+    sqrt (_d vectorDotProduct _d);
+};
+
+
+if (GVAR(freedrawing)) then {
+    _pos = _theMap ctrlMapScreenToWorld getMousePosition;
+    _pos set [2, 0];
+
+    switch (true) do {
+    case (_pos inPolygon [_posCenter, _posTopLeft, _posBottomLeft]): {
+            systemChat "Left";
+            _dist = ([_posTopLeft, _posBottomLeft, _pos] call _fnc_Distance);
+            _pos = _pos vectorAdd ([_dist, (GVAR(mapTool_angle) - 90) ,0] call CBA_fnc_polar2vect);
+            _screen = _theMap ctrlMapWorldToScreen _pos;
+            setMousePosition _screen;
+        };
+    case (_pos inPolygon [_posCenter, _posTopLeft, _posTopRight]): {
+            systemChat "Top";
+            _dist = ([_posTopLeft, _posTopRight, _pos] call _fnc_Distance);
+            _pos = _pos vectorAdd ([_dist, (GVAR(mapTool_angle) + 0) ,0] call CBA_fnc_polar2vect);
+            _screen = _theMap ctrlMapWorldToScreen _pos;
+            setMousePosition _screen;
+        };
+        ///
+    };
+};
+
+
 if ((GVAR(mapTool_Shown) == 0) || {!("ACE_MapTools" in items ACE_player)}) exitWith {};
 
 private _rotatingTexture = "";

@@ -9,11 +9,28 @@
  * Return Value:
  * Boolean, true if event was handled
  */
+#define DEBUG_MODE_FULL
 #include "script_component.hpp"
 
 params ["_dir", "_params"];
 _params params ["_control", "_button", "_screenPosX", "_screenPosY", "_shiftKey", "_ctrlKey", "_altKey"];
 TRACE_2("params",_dir,_params);
+
+
+
+if (_ctrlKey) exitWith {
+    if (GVAR(freedrawing)) then {
+        TRACE_2("ending",GVAR(freedrawing));
+        GVAR(freedrawing) = false;
+    } else {
+
+        GVAR(freedrawing) = true;
+        TRACE_2("starting",GVAR(freedrawing));
+        // setMousePosition [0.5, 0.5];
+    };
+};
+
+
 
 private _handled = false;
 

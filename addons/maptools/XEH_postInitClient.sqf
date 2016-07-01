@@ -32,3 +32,6 @@ GVAR(mapTool_isRotating) = false;
         [false] call FUNC(openMapGps);
     };
 }] call CBA_fnc_addPlayerEventHandler;
+
+GVAR(freedrawing) = false;
+
